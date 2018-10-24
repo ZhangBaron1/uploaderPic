@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>发布</title>
+    <link href="http://cdn.staticfile.org/emoji/0.2.2/emoji.css" rel="stylesheet" type="text/css">
+    <script src="http://cdn.staticfile.org/emoji/0.2.2/emoji.js"></script>
+    <script src="res/vue.min.js" type="text/javascript" charset="utf-8"></script>
+    <link href="css/common.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.bootcss.com/weui/1.1.3/style/weui.min.css">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/jquery-weui/1.2.1/css/jquery-weui.min.css">
+    <link rel="stylesheet" href="css/mui.min.css">
+    <link rel="stylesheet" href="css/release.css">
+</head>
+<body>
+    <header class="releaseHeader___1-gPz">
+    <p class="close___1_x1N">×</p>
+    <a role="button" class="am-button submit___2iUx- submit-btn" aria-disabled="false">
+        <span>发 布</span>
+    </a>
+</header>
+    <div class="text___1ItXI">
+        <div class="am-list-item am-textarea-item am-textarea-has-count">
+            <div class="am-textarea-control">
+                <textarea maxlength="100" placeholder="这个一刻想说点什么...." rows="5"></textarea>
+            </div>
+            <span class="am-textarea-count">
+                <span>0</span>/100
+            </span>
+        </div>
+    </div>
+    <div class="am-whitespace am-whitespace-md"></div>
+
+    <div class="weui-gallery" id="gallery">
+        <span class="weui-gallery__img" id="galleryImg"></span>
+        <div class="weui-gallery__opr">
+            <a href="javascript:;" class="weui-gallery__del">
+                <i class="weui-icon-delete weui-icon_gallery-delete"></i>
+            </a>
+        </div>
+    </div>
+    <div class="weui-cells weui-cells_form">
+        <div class="weui-cell">
+            <div class="weui-cell__bd">
+                <div class="weui-uploader">
+                    <div class="weui-uploader__bd">
+                        <ul class="weui-uploader__files" id="uploaderFiles">
+
+                        </ul>
+                        <div class="weui-uploader__input-box">
+                            <input id="uploaderInput" class="weui-uploader__input zjxfjs_file" type="file" accept="image/*" multiple="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="fixFooter" id="footer">
+        <nav>
+            <p i="0" @click="changeTab(0)" :class="{'active':pdType==0}">最新</p>
+            <p i="1" @click="changeTab(1)" :class="{'active':pdType==1}">热门</p>
+            <p i="2" @click="changeTab(2)" :class="{'active':pdType==2}">发布</p>
+            <p i="3" @click="changeTab(3)" :class="{'active':pdType==3}">翻牌</p>
+            <p i="4" @click="changeTab(4)" :class="{'active':pdType==4}">活动</p>
+        </nav>
+    </div>
+    <script>
+        //创建vue对象
+        var vm = new Vue({
+            el: "#footer",
+            data: {
+                pdType: 2
+            },
+            methods: {
+                //切换菜单
+                changeTab:function(pdType){
+
+                    if(this.pdType!=pdType){
+                        this.pdType=pdType;
+                        //重置列表数据
+                        this.pdlist = [];//先置空列表,可显示上拉的加载进度
+                        this.mescroll.resetUpScroll();
+                        //隐藏回到顶部按钮
+                        this.mescroll.hideTopBtn();
+
+                        //这里为了模拟加载中的占位图,延长了懒加载的时间间隔
+                        if(pdType==2){
+                            this.mescroll.optUp.lazyLoad.delay=5000;
+                        }else{
+                            this.mescroll.optUp.lazyLoad.delay=300;//默认 300ms
+                        }
+                    }
+                }
+            }
+        })
+    </script>
+    <script src="js/zepto.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js" type="text/javascript" charset="utf-8"></script>
+    <!--<script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>-->
+    <script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/jquery-weui.min.js"></script>
+
+    <script>
+        mui.init();
+        $(function() {
+            var tmpl = '<li class="weui-uploader__file" style="background-image:url(#url#)"><div class="am-image-picker-item-remove" role="button" aria-label="Click and Remove this image"></div></li>',
+                $gallery = $("#gallery"),
+                $galleryImg = $("#galleryImg"),
+                $uploaderInput = $("#uploaderInput"),
+                $uploaderFiles = $("#uploaderFiles");
+
+            $uploaderInput.on("change", function(e) {
+
+                var src, url = window.URL || window.webkitURL || window.mozURL,
+                    files = e.target.files;
+                var max = 4;
+                    if(files.length > 4)
+                        max = 4;
+
+                for(var i = 0,len = files.length; i < len; ++i) {
+                    var file = files[i];
+
+                    if(url) {
+                        src = url.createObjectURL(file);
+                    } else {
+                        src = e.target.result;
+                    }
+                    if($("#uploaderFiles li").length < max){
+                        $uploaderFiles.append($(tmpl.replace('#url#', src)));
+                        if($("#uploaderFiles li").length == max)                    //到了最大张数不能再加了
+                            $(".weui-uploader__input-box").hide();
+                    }else{
+                        $(".weui-uploader__input-box").hide();
+                        return;
+                    }
+                }
+            });
+
+            var index; //第几张图片
+            $uploaderFiles.on("click", ".am-image-picker-item-remove", function() {          // 在图片右上角删除图片
+                index = $(this).index();
+                $uploaderFiles.find("li").eq(index).remove();
+                $(".weui-uploader__input-box").show();                                       //能删就能再加张数
+                return false;
+            });
+
+            $uploaderFiles.on("click", "li", function() {
+                index = $(this).index();
+                $galleryImg.attr("style", this.getAttribute("style"));
+                $gallery.fadeIn(100);
+            });
+            $gallery.on("click", function() {
+                $gallery.fadeOut(100);
+            });
+            //删除图片
+            $(".weui-gallery__del").click(function() {
+                $uploaderFiles.find("li").eq(index).remove();
+                $(".weui-uploader__input-box").show();                                      //能删就能再加张数
+            });
+
+            $(".am-textarea-control textarea").bind("input", function(e) {
+                $(".am-textarea-count span").html($(this).val().length);
+            });
+
+            $(".submit-btn").on("click", function() {                                    // 提交事件
+                console.log($(".am-textarea-control textarea").val());
+            });
+
+            $(".close___1_x1N").on("click", function() {                                    // 左上角×事件
+                console.log("关闭页面了！！！回家吧");
+            });
+        });
+    </script>
+</body>
+</html>
